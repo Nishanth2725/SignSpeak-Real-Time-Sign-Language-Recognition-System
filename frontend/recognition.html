@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSpeak - Live Recognition</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .recognition-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 900px) {
+            .recognition-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 4/3;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+        }
+        .video-container.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+        }
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror */
+        }
+        #output_canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transform: scaleX(-1); /* Mirror */
+            z-index: 10;
+        }
+        .status-overlay {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(4px);
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+        }
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        .sentence-box {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            font-size: 1.25rem;
+            resize: none;
+            margin-bottom: 1rem;
+        }
+        .sentence-box:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SignSpeak</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="recognition.html" class="active">Live Recognition</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+        <div class="auth-buttons" id="nav-auth-section"></div>
+    </nav>
+
+    <div class="container" style="max-width: 1400px;">
+        <div class="recognition-layout">
+            
+            <!-- Left: Webcam -->
+            <div>
+                <div class="video-container" id="video-container">
+                    <div class="status-overlay">
+                        <div class="status-dot" id="cam-status-dot"></div>
+                        <span id="cam-status-text">Camera Off</span>
+                    </div>
+                    <video id="webcam" autoplay playsinline></video>
+                    <canvas id="output_canvas"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <button id="btn-start" class="btn btn-primary">Start Camera</button>
+                    <button id="btn-stop" class="btn btn-outline" disabled>Stop Camera</button>
+                </div>
+                <div id="error-message" style="color: var(--danger); margin-top: 1rem;"></div>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="glass-card">
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 1rem;">Current Sign</h3>
+                <h1 id="current-sign" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 0.5rem; min-height: 3.5rem;">...</h1>
+                
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                        <span>Confidence</span>
+                        <span id="confidence-text">0%</span>
+                    </div>
+                    <div style="width: 100%; background: rgba(255,255,255,0.1); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="confidence-bar" style="width: 0%; height: 100%; background: var(--primary-color); transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 1rem;">Sentence Builder</h3>
+                <textarea id="sentence-box" class="sentence-box" placeholder="Recognized words will appear here..."></textarea>
+                
+                <div class="controls" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="btn-undo" class="btn btn-outline" style="padding: 0.5rem 1rem;">Undo</button>
+                        <button id="btn-clear" class="btn btn-danger" style="padding: 0.5rem 1rem;">Clear</button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="btn-speak" class="btn btn-primary" style="padding: 0.5rem 1rem;">🔊 Speak</button>
+                        <button id="btn-save" class="btn btn-outline" style="padding: 0.5rem 1rem;">Save Result</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- App Logic -->
+    <!-- App Logic -->
+    <script src="js/app.js"></script>
+    <script src="js/speech.js"></script>
+    <script src="js/gestureRecognition.js"></script>
+    <script src="js/handDetection.js"></script>
+    <script src="js/camera.js"></script>
+</body>
+</html>

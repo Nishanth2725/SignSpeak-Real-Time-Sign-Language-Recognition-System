@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSpeak - How It Works</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SignSpeak</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="recognition.html">Live Recognition</a></li>
+            <li><a href="about.html" class="active">How It Works</a></li>
+        </ul>
+        <div class="auth-buttons" id="nav-auth-section"></div>
+    </nav>
+
+    <div class="container">
+        <h2 style="margin-bottom: 2rem;">How SignSpeak Works</h2>
+        
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3>The Technology Pipeline</h3>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-top: 1rem;">
+                SignSpeak leverages modern browser technologies and computer vision to run entirely in your web browser. This ensures maximum privacy, as your video feed never leaves your device.
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; align-items: center;">
+                <div style="background: rgba(0,210,255,0.1); padding: 1rem; border-radius: 8px; width: 100%; max-width: 500px; text-align: center; border: 1px solid var(--primary-color);">
+                    <strong>1. Webcam Input</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">Captures real-time video via WebRTC</span>
+                </div>
+                <div style="color: var(--primary-color);">↓</div>
+                <div style="background: rgba(0,210,255,0.1); padding: 1rem; border-radius: 8px; width: 100%; max-width: 500px; text-align: center; border: 1px solid var(--primary-color);">
+                    <strong>2. Hand Landmark Detection</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">MediaPipe Tasks Vision extracts 21 3D landmarks per hand</span>
+                </div>
+                <div style="color: var(--primary-color);">↓</div>
+                <div style="background: rgba(0,210,255,0.1); padding: 1rem; border-radius: 8px; width: 100%; max-width: 500px; text-align: center; border: 1px solid var(--primary-color);">
+                    <strong>3. Gesture Classification</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">Heuristic algorithms analyze finger states and geometry</span>
+                </div>
+                <div style="color: var(--primary-color);">↓</div>
+                <div style="background: rgba(0,210,255,0.1); padding: 1rem; border-radius: 8px; width: 100%; max-width: 500px; text-align: center; border: 1px solid var(--primary-color);">
+                    <strong>4. Text & Speech Output</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">Words are built into sentences and spoken via Web Speech API</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Prototype Limitations</h3>
+            <p style="color: var(--text-muted); line-height: 1.6; margin-top: 1rem;">
+                This system is a prototype designed to demonstrate the feasibility of browser-based real-time gesture recognition. It currently supports a limited vocabulary of static demonstration signs (e.g., Hello, Thumbs Up, Peace/Victory, Open Palm) and is not a complete natural sign language translator (like ASL or BSL), which rely heavily on facial expressions, body movement, and temporal grammar.
+            </p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

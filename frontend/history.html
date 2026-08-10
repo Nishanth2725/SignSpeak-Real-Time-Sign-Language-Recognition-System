@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSpeak - History</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SignSpeak</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="recognition.html">Live Recognition</a></li>
+            <li><a href="history.html" class="active">History</a></li>
+        </ul>
+        <div class="auth-buttons" id="nav-auth-section"></div>
+    </nav>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2>Recognition History</h2>
+            <button onclick="clearHistory()" class="btn btn-danger">Clear All</button>
+        </div>
+        
+        <div class="glass-card" style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Sign Recognized</th>
+                        <th>Confidence</th>
+                        <th>Sentence Context</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        async function loadHistory() {
+            try {
+                const history = await apiCall('/history');
+                const tbody = document.getElementById('history-body');
+                
+                if (history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No history found.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = history.map(item => {
+                    const date = new Date(item.timestamp).toLocaleString();
+                    return `
+                        <tr>
+                            <td>${date}</td>
+                            <td style="color: var(--primary-color); font-weight: bold;">${item.sign}</td>
+                            <td>${item.confidence}%</td>
+                            <td style="color: var(--text-muted);">${item.sentence}</td>
+                            <td><button onclick="deleteItem('${item.id}')" class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Delete</button></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error('Failed to load history', err);
+            }
+        }
+
+        async function clearHistory() {
+            if (confirm('Are you sure you want to clear all history?')) {
+                try {
+                    await apiCall('/history', 'DELETE');
+                    loadHistory();
+                } catch (err) {
+                    alert('Failed to clear history');
+                }
+            }
+        }
+
+        async function deleteItem(id) {
+            try {
+                await apiCall(`/history/${id}`, 'DELETE');
+                loadHistory();
+            } catch (err) {
+                alert('Failed to delete item');
+            }
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>

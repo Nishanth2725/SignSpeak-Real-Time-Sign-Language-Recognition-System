@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSpeak - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">SignSpeak</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="recognition.html">Live Recognition</a></li>
+            <li><a href="history.html">History</a></li>
+        </ul>
+        <div class="auth-buttons" id="nav-auth-section"></div>
+    </nav>
+
+    <div class="container">
+        <h2 style="margin-bottom: 2rem;">Dashboard</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+            <div class="glass-card" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem;">Total Signs</h3>
+                <h1 id="stat-total" style="font-size: 3rem; margin: 1rem 0; color: var(--primary-color);">0</h1>
+            </div>
+            <div class="glass-card" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem;">Today's Signs</h3>
+                <h1 id="stat-today" style="font-size: 3rem; margin: 1rem 0; color: var(--success);">0</h1>
+            </div>
+            <div class="glass-card" style="text-align: center;">
+                <h3 style="color: var(--text-muted); font-size: 1rem;">Avg Confidence</h3>
+                <h1 id="stat-conf" style="font-size: 3rem; margin: 1rem 0; color: var(--secondary-color);">0%</h1>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3>Most Frequent Signs</h3>
+            <ul id="freq-list" style="list-style: none; margin-top: 1rem; color: var(--text-muted);">
+                <li>Loading...</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <a href="recognition.html" class="btn btn-primary">Start New Recognition Session</a>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        if (!isAuthenticated()) {
+            window.location.href = 'login.html';
+        }
+
+        async function loadStats() {
+            try {
+                const stats = await apiCall('/stats');
+                document.getElementById('stat-total').innerText = stats.totalSigns;
+                document.getElementById('stat-today').innerText = stats.todaySigns;
+                document.getElementById('stat-conf').innerText = stats.averageConfidence + '%';
+                
+                const freqList = document.getElementById('freq-list');
+                if (stats.mostFrequent.length > 0) {
+                    freqList.innerHTML = stats.mostFrequent.map(s => `
+                        <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--glass-border);">
+                            <span style="color: white; font-weight: 600;">${s}</span>
+                        </li>
+                    `).join('');
+                } else {
+                    freqList.innerHTML = '<li>No signs recognized yet.</li>';
+                }
+            } catch (err) {
+                console.error('Failed to load stats', err);
+            }
+        }
+
+        loadStats();
+    </script>
+</body>
+</html>
